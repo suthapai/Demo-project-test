@@ -1,0 +1,46 @@
+resources:
+  repositories:
+  - repository: MyGitHubRepo # The name used to reference this repository in the checkout step
+    type: github
+    endpoint: github.com_suthapai
+    name: suthapai/Demo-project-test
+variables:
+  - group: vnet-variables
+  - group: vm-variables
+  - group: acr_variables
+trigger: 
+ - main
+   
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: create_acr
+  jobs:
+  - job: create_acr_job
+    displayName: Create Azure Container Registry
+    steps:
+    - checkout: MyGitHubRepo
+    - task: TerraformInstaller@1
+      inputs:
+         terraformVersion: 'latest'
+    - task: TerraformTaskV4@4
+      displayName: Terraform Init_acr
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/private-acr'
+        backendServiceArm: 'Azureportal-devops-sc'
+        backendAzureRmResourceGroupName: 'rg-tfstate'
+        backendAzureRmStorageAccountName: 'sgtfstatefile'
+        backendAzureRmContainerName: 'mytfstate'
+        backendAzureRmKey: 'acr.tfstate'
+    - task: TerraformTaskV4@4
+      displayName: Terraform Apply_acr
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/private-acr'
+        environmentServiceNameAzureRM: 'Azureportal-devops-sc'
+   
