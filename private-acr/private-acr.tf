@@ -97,11 +97,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "agent-vnet-link" {
 
 #### Fetching the service principle object Id so we can add role assignment on ACR ###
 data "azuread_service_principal" "acr-access" {
-  display_name = "acr-access"
+   client_id = "43e3e3be-82bb-49e8-b830-2ad8a08ca9f3"
 }
 
 resource "azurerm_role_assignment" "Acrpush_role" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPush"
   principal_id         = data.azuread_service_principal.acr-access.object_id ##Object ID
+  skip_service_principal_aad_check = true
 }
