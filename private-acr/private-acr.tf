@@ -97,7 +97,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "agent-vnet-link" {
 
 #### Fetching the service principle object Id so we can add role assignment on ACR ###
 data "azuread_service_principal" "acr-access" {
-  display_name = "sujethapai-Infrastructure-08eb8cb4-b258-4f5f-beda-91666f042b47"
+  display_name = "acr-access"
 }
 
 resource "azurerm_role_assignment" "Acrpush_role" {
